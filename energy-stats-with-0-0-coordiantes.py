@@ -29,8 +29,8 @@ LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 dim = 0.3
 dim_night = 0.1
 max_consumption = 10000
-get_delay = 2
-get_times = 1
+get_delay = 5
+get_times = 3
 ##########
 
 def get_bat():
@@ -67,13 +67,13 @@ def colorWipe(strip, color, area ,wait_ms=50):
 def wheel(pos):
     """Generate rainbow colors across 0-255 positions."""
     if pos < 85:
-        return Color(pos * 3, 255 - pos * 3, 0)
+        return int(Color(pos * 3, 255 - pos * 3, 0))
     elif pos < 170:
         pos -= 85
-        return Color(255 - pos * 3, 0, pos * 3)
+        return int(Color(255 - pos * 3, 0, pos * 3))
     else:
         pos -= 170
-        return Color(0, pos * 3, 255 - pos * 3)
+        return int(Color(0, pos * 3, 255 - pos * 3))
 
 def rainbowCycle(strip, wait_ms=20, iterations=5):
     """Draw rainbow that uniformly distributes itself across all pixels."""
@@ -87,7 +87,7 @@ def rainbowCycle(strip, wait_ms=20, iterations=5):
 
 def get_bat_color(bat_change, bat_percentage, dim):
     if bat_percentage > 0.98:
-        return Color(0,int(100*dim),int(255*dim))
+        return int(Color(0,int(100*dim),int(255*dim)))
 
     mid_h = 50  # yellow
     max_change_watts = 4500
@@ -105,7 +105,7 @@ def get_bat_color(bat_change, bat_percentage, dim):
     r = int(r * dim)
     g = int(g * dim)
     b = int(b * dim)
-    return Color(r, g, b)
+    return int(Color(r, g, b))
 
 def get_bat_coverage(bat_percentage):
     mid = int(LED_COUNT//2)
@@ -115,9 +115,9 @@ def get_bat_coverage(bat_percentage):
 
 def get_grid_color(grid, dim):
     if grid > 0:
-        return Color(int(255*dim), 0, 0)
+        return int(Color(int(255*dim), 0, 0))
     else:
-        return Color(0, 0, int(255*dim))
+        return int(Color(0, 0, int(255*dim)))
 
 def get_grid_length(grid, max_consumption):
     return int((abs(grid) / max_consumption) * (LED_COUNT//2))
@@ -132,7 +132,7 @@ def get_solar_color(solar, dim):
     r = int(255 * dim)
     g = int(255 * dim)
     b = 0
-    return Color(r,g,b)
+    return int(Color(r,g,b))
 
 
 #############################################
@@ -251,11 +251,11 @@ if __name__ == '__main__':
         # Do Consupotion
         mid = LED_COUNT//2 +1
         for i in range(mid, mid + get_solar_length(solar_to_display, max_consumption)):
-            strip.setPixelColor(i, Color(int(255*dim), int(255*dim), 0))
+            strip.setPixelColor(i, int(Color(int(255*dim)), int(255*dim), 0))
 
         if i == 0: i = mid
         for j in range(i, i + get_bat_length(bat_change_to_display, max_consumption)):
-            strip.setPixelColor(j, Color(0, int(255 * dim), 0))
+            strip.setPixelColor(j, int(Color(0, int(255 * dim)), 0))
 
         if j == 0:
             if i == 0:
@@ -266,11 +266,11 @@ if __name__ == '__main__':
         for k in range(j, j + get_grid_length(grid, max_consumption)):
             strip.setPixelColor(k, get_grid_color(grid, dim))
 
-
-        mid_color = Color(int(255*dim), int(255*dim), int(255*dim))
+        if consumption > max_consumption:
+            mid_color = int(Color(int(190*dim)), 0, int(255*dim))
+        else:
+            mid_color = int(Color(int(255*dim), int(255*dim), int(255*dim)))
         strip.setPixelColor(mid-1, mid_color)
-        #strip.setPixelColor(52, Color(255, 255, 255))
-        # SHOW
         strip.show()
 
     except KeyboardInterrupt:
